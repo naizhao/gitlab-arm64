@@ -4,7 +4,12 @@
 [![Docker Pulls][dockerhub-badge-pulls]][dockerhub]
 [![Docker Image Size (tag)][dockerhub-badge-image-size-ce]][dockerhub]
 [![Docker Image Size (tag)][dockerhub-badge-image-size-ee]][dockerhub]
-[![Docker Image Version (latest by date)][dockerhub-badge-latest-version]][dockerhub]
+[![Docker Image Size (tag)][dockerhub-badge-image-size-16-ce]][dockerhub]
+[![Docker Image Size (tag)][dockerhub-badge-image-size-16-ee]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-ce]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-ee]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16-ce]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16-ee]][dockerhub]
 
 [github-actions]: https://github.com/naizhao/gitlab-arm64/actions/workflows/build.yml
 [github-actions-badge]: https://github.com/naizhao/gitlab-arm64/actions/workflows/build.yml/badge.svg?branch=main
@@ -12,7 +17,12 @@
 [dockerhub-badge-pulls]: https://img.shields.io/docker/pulls/naizhao/gitlab-arm64?logo=docker
 [dockerhub-badge-image-size-ce]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/ce?label=gitlab-ce&logo=docker
 [dockerhub-badge-image-size-ee]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/ee?label=gitlab-ee&logo=docker
-[dockerhub-badge-latest-version]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/ce?arch=arm64&logo=docker
+[dockerhub-badge-image-size-16-ce]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/16-ce?label=gitlab-16-ce&logo=docker
+[dockerhub-badge-image-size-16-ee]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/16-ee?label=gitlab-16-ee&logo=docker
+[dockerhub-badge-latest-version-ce]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/ce?arch=arm64&logo=docker
+[dockerhub-badge-latest-version-ee]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/ee?arch=arm64&logo=docker
+[dockerhub-badge-latest-version-16-ce]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16-ce?arch=arm64&logo=docker
+[dockerhub-badge-latest-version-16-ee]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16-ee?arch=arm64&logo=docker
 [ghcr]: https://github.com/naizhao/gitlab-arm64/pkgs/container/gitlab-arm
 
 English | [简体中文](./README.zh-Hans.md)
