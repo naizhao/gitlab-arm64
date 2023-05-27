@@ -2,10 +2,12 @@
 
 [![build-badge][github-actions-badge]][github-actions]
 [![Docker Pulls][dockerhub-badge-pulls]][dockerhub]
+
 [![Docker Image Size (tag)][dockerhub-badge-image-size-ce]][dockerhub]
 [![Docker Image Size (tag)][dockerhub-badge-image-size-ee]][dockerhub]
 [![Docker Image Size (tag)][dockerhub-badge-image-size-16-ce]][dockerhub]
 [![Docker Image Size (tag)][dockerhub-badge-image-size-16-ee]][dockerhub]
+
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version-ce]][dockerhub]
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version-ee]][dockerhub]
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16-ce]][dockerhub]
