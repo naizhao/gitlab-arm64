@@ -2,18 +2,30 @@
 
 [![build-badge][github-actions-badge]][github-actions]
 [![Docker Pulls][dockerhub-badge-pulls]][dockerhub]
+
 [![Docker Image Size (tag)][dockerhub-badge-image-size-ce]][dockerhub]
 [![Docker Image Size (tag)][dockerhub-badge-image-size-ee]][dockerhub]
-[![Docker Image Version (latest by date)][dockerhub-badge-latest-version]][dockerhub]
+[![Docker Image Size (tag)][dockerhub-badge-image-size-16-ce]][dockerhub]
+[![Docker Image Size (tag)][dockerhub-badge-image-size-16-ee]][dockerhub]
 
-[github-actions]: https://github.com/zengxs/gitlab-docker/actions/workflows/build.yml
-[github-actions-badge]: https://github.com/zengxs/gitlab-docker/actions/workflows/build.yml/badge.svg?branch=main
-[dockerhub]: https://hub.docker.com/r/zengxs/gitlab/tags
-[dockerhub-badge-pulls]: https://img.shields.io/docker/pulls/zengxs/gitlab?logo=docker
-[dockerhub-badge-image-size-ce]: https://img.shields.io/docker/image-size/zengxs/gitlab/ce?label=gitlab-ce&logo=docker
-[dockerhub-badge-image-size-ee]: https://img.shields.io/docker/image-size/zengxs/gitlab/ee?label=gitlab-ee&logo=docker
-[dockerhub-badge-latest-version]: https://img.shields.io/docker/v/zengxs/gitlab/ce?arch=arm64&logo=docker
-[ghcr]: https://github.com/zengxs/gitlab-docker/pkgs/container/gitlab-arm
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-ce]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-ee]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16-ce]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16-ee]][dockerhub]
+
+[github-actions]: https://github.com/naizhao/gitlab-arm64/actions/workflows/build.yml
+[github-actions-badge]: https://github.com/naizhao/gitlab-arm64/actions/workflows/build.yml/badge.svg?branch=main
+[dockerhub]: https://hub.docker.com/r/naizhao/gitlab-arm64/tags
+[dockerhub-badge-pulls]: https://img.shields.io/docker/pulls/naizhao/gitlab-arm64?logo=docker
+[dockerhub-badge-image-size-ce]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/ce?label=gitlab-ce&logo=docker
+[dockerhub-badge-image-size-ee]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/ee?label=gitlab-ee&logo=docker
+[dockerhub-badge-image-size-16-ce]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/16-ce?label=gitlab-16-ce&logo=docker
+[dockerhub-badge-image-size-16-ee]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/16-ee?label=gitlab-16-ee&logo=docker
+[dockerhub-badge-latest-version-ce]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/ce?arch=arm64&logo=docker
+[dockerhub-badge-latest-version-ee]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/ee?arch=arm64&logo=docker
+[dockerhub-badge-latest-version-16-ce]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16-ce?arch=arm64&logo=docker
+[dockerhub-badge-latest-version-16-ee]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16-ee?arch=arm64&logo=docker
+[ghcr]: https://github.com/naizhao/gitlab-arm64/pkgs/container/gitlab-arm
 
 [English](./README.md) | 简体中文
 
@@ -53,11 +65,16 @@ DockerHub 提供了自 13.12 起的所有小版本 (每个 minor version 至少�
 
 ```sh
 # 拉取最新的 GitLab CE 镜像
-docker pull zengxs/gitlab:ce
+docker pull naizhao/gitlab-arm64:ce
 # 拉取最新的 GitLab EE 镜像
-docker pull zengxs/gitlab:ee
+docker pull naizhao/gitlab-arm64:ee
+# 拉取最新的 GitLab CE 16 镜像
+docker pull naizhao/gitlab-arm64:16-ce
+# 拉取最新的 GitLab EE 16 镜像
+docker pull naizhao/gitlab-arm64:16-ee
 # 拉取指定版本的 GitLab CE/EE 镜像
-docker pull zengxs/gitlab:15.7.0-ce.0
+docker pull naizhao/gitlab-arm64:15.7.0-ce.0
+docker pull naizhao/gitlab-arm64:16.0.1-ce.0
 ```
 
 > 提示:
