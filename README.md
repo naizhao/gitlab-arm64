@@ -6,14 +6,14 @@
 [![Docker Image Size (tag)][dockerhub-badge-image-size-ee]][dockerhub]
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version]][dockerhub]
 
-[github-actions]: https://github.com/zengxs/gitlab-docker/actions/workflows/build.yml
-[github-actions-badge]: https://github.com/zengxs/gitlab-docker/actions/workflows/build.yml/badge.svg?branch=main
-[dockerhub]: https://hub.docker.com/r/zengxs/gitlab/tags
-[dockerhub-badge-pulls]: https://img.shields.io/docker/pulls/zengxs/gitlab?logo=docker
-[dockerhub-badge-image-size-ce]: https://img.shields.io/docker/image-size/zengxs/gitlab/ce?label=gitlab-ce&logo=docker
-[dockerhub-badge-image-size-ee]: https://img.shields.io/docker/image-size/zengxs/gitlab/ee?label=gitlab-ee&logo=docker
-[dockerhub-badge-latest-version]: https://img.shields.io/docker/v/zengxs/gitlab/ce?arch=arm64&logo=docker
-[ghcr]: https://github.com/zengxs/gitlab-docker/pkgs/container/gitlab-arm
+[github-actions]: https://github.com/naizhao/gitlab-arm64/actions/workflows/build.yml
+[github-actions-badge]: https://github.com/naizhao/gitlab-arm64/actions/workflows/build.yml/badge.svg?branch=main
+[dockerhub]: https://hub.docker.com/r/naizhao/gitlab-arm64/tags
+[dockerhub-badge-pulls]: https://img.shields.io/docker/pulls/naizhao/gitlab-arm64?logo=docker
+[dockerhub-badge-image-size-ce]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/ce?label=gitlab-ce&logo=docker
+[dockerhub-badge-image-size-ee]: https://img.shields.io/docker/image-size/naizhao/gitlab-arm64/ee?label=gitlab-ee&logo=docker
+[dockerhub-badge-latest-version]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/ce?arch=arm64&logo=docker
+[ghcr]: https://github.com/naizhao/gitlab-arm64/pkgs/container/gitlab-arm
 
 English | [简体中文](./README.zh-Hans.md)
 
@@ -58,11 +58,16 @@ Pull image from DockerHub:
 
 ```sh
 # Pull latest GitLab CE image
-docker pull zengxs/gitlab:ce
+docker pull naizhao/gitlab-arm64:ce
+# Pull latest GitLab CE 16 image
+docker pull naizhao/gitlab-arm64:16-ce
 # Pull latest GitLab EE image
-docker pull zengxs/gitlab:ee
+docker pull naizhao/gitlab-arm64:ee
+# Pull latest GitLab EE 16 image
+docker pull naizhao/gitlab-arm64:16-ee
 # Pull specific version of GitLab image
-docker pull zengxs/gitlab:15.7.0-ce.0
+docker pull naizhao/gitlab-arm64:15.7.0-ce.0
+docker pull naizhao/gitlab-arm64:16.0.1-ce.0
 ```
 
 > Note:
