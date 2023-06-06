@@ -15,11 +15,11 @@ jobs:
             RELEASE_VERSION: 15.11.7-ee.0
             PUSH_TAGS: 15.11.7-ee.0,15.11.7-ee,15.11-ee,15-ee,ee,latest-15,latest
           - RELEASE_PACKAGE: gitlab-ce
-            RELEASE_VERSION: 16.0.0-ce.0
-            PUSH_TAGS: 16.0.0-ce.0,16.0.0-ce,16.0-ce,16-ce
+            RELEASE_VERSION: 16.0.2-ce.0
+            PUSH_TAGS: 16.0.2-ce.0,16.0.2-ce,16.0-ce,16-ce
           - RELEASE_PACKAGE: gitlab-ee
-            RELEASE_VERSION: 16.0.0-ee.0
-            PUSH_TAGS: 16.0.0-ee.0,16.0.0-ee,16.0-ee,16-ee,latest-16
+            RELEASE_VERSION: 16.0.2-ee.0
+            PUSH_TAGS: 16.0.2-ee.0,16.0.2-ee,16.0-ee,16-ee,latest-16
 
     steps:
       - uses: actions/checkout@v2
