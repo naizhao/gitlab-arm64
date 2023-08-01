@@ -9,6 +9,8 @@
 [![Docker Image Size (tag)][dockerhub-badge-image-size-16.0-ee]][dockerhub]
 [![Docker Image Size (tag)][dockerhub-badge-image-size-16.1-ce]][dockerhub]
 [![Docker Image Size (tag)][dockerhub-badge-image-size-16.1-ee]][dockerhub]
+[![Docker Image Size (tag)][dockerhub-badge-image-size-16.2-ce]][dockerhub]
+[![Docker Image Size (tag)][dockerhub-badge-image-size-16.2-ee]][dockerhub]
 
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version-15-ce]][dockerhub]
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version-15-ee]][dockerhub]
@@ -16,6 +18,8 @@
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16.0-ee]][dockerhub]
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16.1-ce]][dockerhub]
 [![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16.1-ee]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16.2-ce]][dockerhub]
+[![Docker Image Version (latest by date)][dockerhub-badge-latest-version-16.2-ee]][dockerhub]
 
 [github-actions]: https://github.com/naizhao/gitlab-arm64/actions/workflows/build.yml
 [github-actions-badge]: https://github.com/naizhao/gitlab-arm64/actions/workflows/build.yml/badge.svg?branch=main
@@ -33,6 +37,8 @@
 [dockerhub-badge-latest-version-16.0-ee]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16.0-ee?arch=arm64&logo=docker
 [dockerhub-badge-latest-version-16.1-ce]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16.1-ce?arch=arm64&logo=docker
 [dockerhub-badge-latest-version-16.1-ee]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16.1-ee?arch=arm64&logo=docker
+[dockerhub-badge-latest-version-16.2-ce]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16.2-ce?arch=arm64&logo=docker
+[dockerhub-badge-latest-version-16.2-ee]: https://img.shields.io/docker/v/naizhao/gitlab-arm64/16.2-ee?arch=arm64&logo=docker
 [ghcr]: https://github.com/naizhao/gitlab-arm64/pkgs/container/gitlab-arm
 
 English | [简体中文](./README.zh-Hans.md)
