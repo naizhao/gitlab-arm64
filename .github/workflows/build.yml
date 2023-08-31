@@ -9,30 +9,6 @@ jobs:
       matrix:
         include:
           - RELEASE_PACKAGE: gitlab-ce
-            RELEASE_VERSION: 15.11.13-ce.0
-            PUSH_TAGS: 15.11.13-ce.0,15.11.13-ce,15.11-ce,15-ce
-          - RELEASE_PACKAGE: gitlab-ee
-            RELEASE_VERSION: 15.11.13-ee.0
-            PUSH_TAGS: 15.11.13-ee.0,15.11.13-ee,15.11-ee,15-ee,latest-15
-          - RELEASE_PACKAGE: gitlab-ce
-            RELEASE_VERSION: 16.0.8-ce.0
-            PUSH_TAGS: 16.0.8-ce.0,16.0.8-ce,16.0-ce
-          - RELEASE_PACKAGE: gitlab-ee
-            RELEASE_VERSION: 16.0.8-ee.0
-            PUSH_TAGS: 16.0.8-ee.0,16.0.8-ee,16.0-ee
-          - RELEASE_PACKAGE: gitlab-ce
-            RELEASE_VERSION: 16.1.4-ce.0
-            PUSH_TAGS: 16.1.4-ce.0,16.1.4-ce,16.1-ce
-          - RELEASE_PACKAGE: gitlab-ee
-            RELEASE_VERSION: 16.1.4-ee.0
-            PUSH_TAGS: 16.1.4-ee.0,16.1.4-ee,16.1-ee
-          - RELEASE_PACKAGE: gitlab-ce
-            RELEASE_VERSION: 16.2.4-ce.0
-            PUSH_TAGS: 16.2.4-ce.0,16.2.4-ce,16.2-ce
-          - RELEASE_PACKAGE: gitlab-ee
-            RELEASE_VERSION: 16.2.4-ee.0
-            PUSH_TAGS: 16.2.4-ee.0,16.2.4-ee,16.2-ee
-          - RELEASE_PACKAGE: gitlab-ce
             RELEASE_VERSION: 16.3.0-ce.0
             PUSH_TAGS: 16.3.0-ce.0,16.3.0-ce,16.3-ce,16-ce,ce
           - RELEASE_PACKAGE: gitlab-ee
