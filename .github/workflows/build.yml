@@ -1,5 +1,8 @@
 name: build
-on: workflow_dispatch
+on:
+  schedule:
+    - cron: '0 0 * * *'  # the action will run everyday at 00:00 UTC
+  workflow_dispatch:  # allows the workflow to be triggered manually
 
 jobs:
   build:
@@ -9,16 +12,51 @@ jobs:
       matrix:
         include:
           - RELEASE_PACKAGE: gitlab-ce
-            RELEASE_VERSION: 16.3.0-ce.0
-            PUSH_TAGS: 16.3.0-ce.0,16.3.0-ce,16.3-ce,16-ce,ce
+            RELEASE_CAT: ce
           - RELEASE_PACKAGE: gitlab-ee
-            RELEASE_VERSION: 16.3.0-ee.0
-            PUSH_TAGS: 16.3.0-ee.0,16.3.0-ee,16.3-ee,16-ee,ee,latest-16,latest
+            RELEASE_CAT: ee
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      - name: Get latest GitLab version
+        id: get-version
+        run: |
+          RELEASE_CAT=${{ matrix.RELEASE_CAT }}
+          VERSION=$(curl --silent "https://gitlab.com/gitlab-org/gitlab/-/tags?format=atom" | grep -oP -m1 '(?<=<summary>Version v)[v\.0-9a-z\-]+(?=-ee)')
+          RELEASE_VERSION="$VERSION-$RELEASE_CAT.0"
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
+
+          # Check if the tag exists in GHCR
+          GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
+          response=$(curl -s -H "Authorization: Bearer ${GHCR_TOKEN}" \
+            "https://ghcr.io/v2/${{ github.repository_owner }}/gitlab-arm64/tags/list")
+            
+          if echo "$response" | grep -q "$RELEASE_VERSION"; then
+            echo "Tag exists in GHCR. Exit the workflow."
+            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+          else 
+            echo "Tag does not exist in GHCR. Continue the workflow."
+            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+
+      - name: Generate PUSH_TAGS
+        id: generate-push-tags
+        if: env.TAG_EXISTS == 'false'
+        run: |
+          VERSION=${{ env.RELEASE_VERSION }}
+          RELEASE_CAT=${{ matrix.RELEASE_CAT }}
+          VERSION=${VERSION/-$RELEASE_CAT.0/}
+          IFS='.' read -ra VER <<< "$VERSION"
+          PUSH_TAGS="${VERSION}-$RELEASE_CAT.0, ${VERSION}-$RELEASE_CAT, ${VER[0]}.${VER[1]}-$RELEASE_CAT, ${VER[0]}-$RELEASE_CAT, $RELEASE_CAT"
+          if [[ "$RELEASE_CAT" == "ee" ]]; then
+            PUSH_TAGS="${PUSH_TAGS}, latest-${VER[0]}, latest"
+          fi
+          echo "PUSH_TAGS=$PUSH_TAGS" >> $GITHUB_ENV
 
       - name: docker login to docker.io
+        if: env.TAG_EXISTS == 'false'
         uses: docker/login-action@v2
         with:
           registry: docker.io
@@ -28,6 +66,7 @@ jobs:
       # Must set write access in the package settings
       # See: https://github.com/docker/build-push-action/issues/463#issuecomment-924995909
       - name: docker login to ghcr.io
+        if: env.TAG_EXISTS == 'false'
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -35,19 +74,23 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup binfmt-support
+        if: env.TAG_EXISTS == 'false'
         uses: docker/setup-qemu-action@v2
 
       - name: Setup docker buildx
+        if: env.TAG_EXISTS == 'false'
         uses: docker/setup-buildx-action@v2
 
       - name: Generate tags
         id: generate-tags
+        if: env.TAG_EXISTS == 'false'
         run: |
-          dockerio_tags=$(echo ${{ matrix.PUSH_TAGS }} | tr ',' '\n' | xargs -I {} echo "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/gitlab-arm64:{}" | tr '\n' ',')
-          ghcr_tags=$(echo ${{ matrix.PUSH_TAGS }} | tr ',' '\n' | xargs -I {} echo "ghcr.io/${{ github.repository_owner }}/gitlab-arm64:{}" | tr '\n' ',')
+          dockerio_tags=$(echo ${{ env.PUSH_TAGS }} | tr ',' '\n' | xargs -I {} echo "docker.io/${{ secrets.DOCKERHUB_USERNAME }}/gitlab-arm64:{}" | tr '\n' ',')
+          ghcr_tags=$(echo ${{ env.PUSH_TAGS }} | tr ',' '\n' | xargs -I {} echo "ghcr.io/${{ github.repository_owner }}/gitlab-arm64:{}" | tr '\n' ',')
           echo "push_tags=${dockerio_tags},${ghcr_tags}" >> $GITHUB_ENV
 
       - name: Build and push
+        if: env.TAG_EXISTS == 'false'
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -56,4 +99,4 @@ jobs:
           platforms: linux/arm64
           build-args: |
             RELEASE_PACKAGE=${{ matrix.RELEASE_PACKAGE }}
-            RELEASE_VERSION=${{ matrix.RELEASE_VERSION }}
+            RELEASE_VERSION=${{ env.RELEASE_VERSION }}

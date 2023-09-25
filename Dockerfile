@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 MAINTAINER GitLab Inc. <support@gitlab.com>
 
 ARG RELEASE_PACKAGE
@@ -19,7 +19,7 @@ RUN apt-get update -q \
       tzdata \
       wget \
       perl \
-      libperl5.30 \
+      libperl5.34 \
       libatomic1 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -36,6 +36,9 @@ RUN busybox --install \
 # Remove MOTD
 RUN rm -rf /etc/update-motd.d /etc/motd /etc/motd.dynamic
 RUN ln -fs /dev/null /run/motd.dynamic
+
+# Legacy code to be removed on 17.0.  See: https://gitlab.com/gitlab-org/omnibus-gitlab/-/merge_requests/7035
+ENV GITLAB_ALLOW_SHA1_RSA=false
 
 # Copy assets
 COPY RELEASE /
@@ -56,9 +59,6 @@ EXPOSE 443 80 22
 
 # Define data volumes
 VOLUME ["/etc/gitlab", "/var/opt/gitlab", "/var/log/gitlab"]
-
-# ensure /assets/wrapper is executable
-RUN chmod +x /assets/wrapper
 
 # Wrapper to handle signal, trigger runit and reconfigure GitLab
 CMD ["/assets/wrapper"]
