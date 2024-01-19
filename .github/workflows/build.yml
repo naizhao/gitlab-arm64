@@ -1,20 +1,39 @@
 name: build
 on:
   schedule:
-    - cron: '0 0 * * *'  # the action will run everyday at 00:00 UTC
+    - cron: '0 0 * * 1,4'
   workflow_dispatch:  # allows the workflow to be triggered manually
 
 jobs:
+  setup-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.get-versions.outputs.versions }}
+      latest_version: ${{ steps.get-versions.outputs.latest_version }}
+    steps:
+      - name: Get latest major GitLab versions
+        id: get-versions
+        run: |
+          VERSIONS=$(curl --silent "https://gitlab.com/gitlab-org/gitlab/-/tags?format=atom" | grep -oP '(?<=<summary>Version v)[v\.0-9\-]+(?=-ee)' | awk -F'.' '!seen[$1"."$2]++' | sort -Vr | head -n4)
+          VERSIONS_ARRAY=($VERSIONS)
+          LATEST_VERSION=${VERSIONS_ARRAY[0]}
+          VERSIONS_JSON=$(echo -n '['; for v in "${VERSIONS_ARRAY[@]}"; do echo -n "\"$v\","; done; echo -n ']')
+          VERSIONS_JSON="${VERSIONS_JSON%,}]" # Remove the trailing comma and close the JSON array
+          echo "VERSIONS=$VERSIONS_JSON" >> $GITHUB_ENV
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+          echo "::set-output name=versions::$VERSIONS_JSON"
+          echo "::set-output name=latest_version::$LATEST_VERSION"
+
   build:
     runs-on: ubuntu-latest
+    needs: setup-versions
     strategy:
       fail-fast: false
       matrix:
+        PACKAGE_CAT: [ce, ee]
+        PACKAGE_VERSIONS: ${{fromJson(needs.setup-versions.outputs.versions)}}
         include:
-          - RELEASE_PACKAGE: gitlab-ce
-            RELEASE_CAT: ce
-          - RELEASE_PACKAGE: gitlab-ee
-            RELEASE_CAT: ee
+          - LATEST_VERSION: ${{needs.setup-versions.outputs.latest_version}}
 
     steps:
       - uses: actions/checkout@v3
@@ -22,22 +41,22 @@ jobs:
       - name: Get latest GitLab version
         id: get-version
         run: |
-          RELEASE_CAT=${{ matrix.RELEASE_CAT }}
-          VERSION=$(curl --silent "https://gitlab.com/gitlab-org/gitlab/-/tags?format=atom" | grep -oP -m1 '(?<=<summary>Version v)[v\.0-9a-z\-]+(?=-ee)')
-          RELEASE_VERSION="$VERSION-$RELEASE_CAT.0"
+          PACKAGE_CAT=${{ matrix.PACKAGE_CAT }}
+          VERSION=${{ matrix.PACKAGE_VERSIONS }}
+          RELEASE_VERSION="$VERSION-$PACKAGE_CAT.0"
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
 
           # Check if the tag exists in GHCR
           GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
           response=$(curl -s -H "Authorization: Bearer ${GHCR_TOKEN}" \
-            "https://ghcr.io/v2/${{ github.repository_owner }}/gitlab-arm64/tags/list")
+            "https://ghcr.io/v2/${{ github.repository_owner }}/gitlab-arm64/manifests/$RELEASE_VERSION")
             
-          if echo "$response" | grep -q "$RELEASE_VERSION"; then
-            echo "Tag exists in GHCR. Exit the workflow."
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
-          else 
+          if echo "$response" | grep -q "MANIFEST_UNKNOWN"; then
             echo "Tag does not exist in GHCR. Continue the workflow."
             echo "TAG_EXISTS=false" >> $GITHUB_ENV
+          else
+            echo "Tag exists in GHCR. Exit the workflow."
+            echo "TAG_EXISTS=true" >> $GITHUB_ENV
           fi
 
 
@@ -46,12 +65,15 @@ jobs:
         if: env.TAG_EXISTS == 'false'
         run: |
           VERSION=${{ env.RELEASE_VERSION }}
-          RELEASE_CAT=${{ matrix.RELEASE_CAT }}
-          VERSION=${VERSION/-$RELEASE_CAT.0/}
+          PACKAGE_CAT=${{ matrix.PACKAGE_CAT }}
+          VERSION=${VERSION/-$PACKAGE_CAT.0/}
           IFS='.' read -ra VER <<< "$VERSION"
-          PUSH_TAGS="${VERSION}-$RELEASE_CAT.0, ${VERSION}-$RELEASE_CAT, ${VER[0]}.${VER[1]}-$RELEASE_CAT, ${VER[0]}-$RELEASE_CAT, $RELEASE_CAT"
-          if [[ "$RELEASE_CAT" == "ee" ]]; then
-            PUSH_TAGS="${PUSH_TAGS}, latest-${VER[0]}, latest"
+          PUSH_TAGS="${VERSION}-$PACKAGE_CAT.0, ${VERSION}-$PACKAGE_CAT, ${VER[0]}.${VER[1]}-$PACKAGE_CAT"
+          if [[ "${{ matrix.LATEST_VERSION }}" == "${VERSION}" ]]; then
+            PUSH_TAGS="${PUSH_TAGS}, ${VER[0]}-$PACKAGE_CAT, $PACKAGE_CAT"
+            if [[ "$PACKAGE_CAT" == "ee" ]]; then
+              PUSH_TAGS="${PUSH_TAGS}, latest-${VER[0]}, latest"
+            fi
           fi
           echo "PUSH_TAGS=$PUSH_TAGS" >> $GITHUB_ENV
 
@@ -98,5 +120,5 @@ jobs:
           tags: ${{ env.push_tags }}
           platforms: linux/arm64
           build-args: |
-            RELEASE_PACKAGE=${{ matrix.RELEASE_PACKAGE }}
+            RELEASE_PACKAGE=gitlab-${{ matrix.PACKAGE_CAT }}
             RELEASE_VERSION=${{ env.RELEASE_VERSION }}
