@@ -1,8 +1,4 @@
-ARG RELEASE_PACKAGE
-ARG RELEASE_VERSION
-ARG RELEASE_ARCH
 ARG BASE_IMAGE=docker.io/ubuntu:22.04
-
 FROM $BASE_IMAGE
 
 ARG BASE_IMAGE
@@ -12,6 +8,9 @@ LABEL org.opencontainers.image.authors="Sam Wu <hongsheng@gmail.com>" \
   org.opencontainers.image.title="GitLab Docker Image ARM64" \
   org.opencontainers.image.base.name=$BASE_IMAGE
 
+ARG RELEASE_PACKAGE
+ARG RELEASE_VERSION
+ARG RELEASE_ARCH
 
 SHELL ["/bin/sh", "-c"]
 
@@ -21,7 +20,6 @@ ENV LANG=C.UTF-8
 # Explicitly set supported locales
 COPY locale.gen /etc/locale.gen
 
-# Install required packages
 # Install required packages
 # Note: libatomic1 is only required for arm64, but it is small enough to not
 # bother about the conditional inclusion logic
