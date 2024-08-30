@@ -4,6 +4,7 @@ LABEL org.opencontainers.image.authors="Sam Wu <hongsheng@gmail.com>" \
   org.opencontainers.image.documentation="https://github.com/naizhao/gitlab-arm64" \
   org.opencontainers.image.source="https://github.com/naizhao/gitlab-arm64" \
   org.opencontainers.image.title="GitLab Docker Image ARM64" \
+  org.opencontainers.image.description="GitLab Docker Image for Arm64" \
   org.opencontainers.image.base.name="ubuntu:22.04"
 
 ARG RELEASE_PACKAGE
