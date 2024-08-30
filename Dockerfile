@@ -1,37 +1,56 @@
-FROM ubuntu:22.04
-MAINTAINER GitLab Inc. <support@gitlab.com>
-
 ARG RELEASE_PACKAGE
 ARG RELEASE_VERSION
 ARG RELEASE_ARCH
+ARG BASE_IMAGE=docker.io/ubuntu:22.04
+
+FROM $BASE_IMAGE
+
+ARG BASE_IMAGE
+LABEL org.opencontainers.image.authors="Sam Wu <hongsheng@gmail.com>" \
+  org.opencontainers.image.documentation="https://github.com/naizhao/gitlab-arm64" \
+  org.opencontainers.image.source="https://github.com/naizhao/gitlab-arm64" \
+  org.opencontainers.image.title="GitLab Docker Image ARM64" \
+  org.opencontainers.image.base.name=$BASE_IMAGE
+
 
 SHELL ["/bin/sh", "-c"]
 
 # Default to supporting utf-8
 ENV LANG=C.UTF-8
 
+# Explicitly set supported locales
+COPY locale.gen /etc/locale.gen
+
 # Install required packages
+# Install required packages
+# Note: libatomic1 is only required for arm64, but it is small enough to not
+# bother about the conditional inclusion logic
 RUN apt-get update -q \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
-      busybox \
-      ca-certificates \
-      openssh-server \
-      tzdata \
-      wget \
-      perl \
-      libperl5.34 \
-      libatomic1 \
-    && rm -rf /var/lib/apt/lists/*
+  && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+  busybox \
+  ca-certificates \
+  locales \
+  openssh-server \
+  tzdata \
+  wget \
+  perl \
+  libperl5.34 \
+  libatomic1 \
+  && locale-gen \
+  && cp -a /usr/lib/locale/locale-archive /tmp/locale-archive \
+  && DEBIAN_FRONTEND=noninteractive apt-get purge -yq locales \
+  && mv /tmp/locale-archive /usr/lib/locale/locale-archive \
+  && rm -rf /var/lib/apt/lists/*
 
 # Use BusyBox
 ENV EDITOR /bin/vi
 RUN busybox --install \
-    && { \
-        echo '#!/bin/sh'; \
-        echo '/bin/vi "$@"'; \
-    } > /usr/local/bin/busybox-editor \
-    && chmod +x /usr/local/bin/busybox-editor \
-    && update-alternatives --install /usr/bin/editor editor /usr/local/bin/busybox-editor 1
+  && { \
+  echo '#!/bin/sh'; \
+  echo '/bin/vi "$@"'; \
+  } > /usr/local/bin/busybox-editor \
+  && chmod +x /usr/local/bin/busybox-editor \
+  && update-alternatives --install /usr/bin/editor editor /usr/local/bin/busybox-editor 1
 
 # Remove MOTD
 RUN rm -rf /etc/update-motd.d /etc/motd /etc/motd.dynamic
@@ -64,4 +83,4 @@ VOLUME ["/etc/gitlab", "/var/opt/gitlab", "/var/log/gitlab"]
 CMD ["/assets/wrapper"]
 
 HEALTHCHECK --interval=60s --timeout=30s --retries=5 \
-CMD /opt/gitlab/bin/gitlab-healthcheck --fail --max-time 10
+  CMD /opt/gitlab/bin/gitlab-healthcheck --fail --max-time 10
