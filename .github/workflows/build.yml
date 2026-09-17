@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: '0 0 * * 1,4'
   workflow_dispatch:  # allows the workflow to be triggered manually
+    inputs:
+      versions:
+        description: '指定要构建的版本，逗号分隔。可写 X.Y（自动取该 minor 的最新 patch）或 X.Y.Z。留空 = 自动扫描各 minor 的最新 patch'
+        required: false
+        default: ''
 
 jobs:
   setup-versions:
@@ -11,18 +16,16 @@ jobs:
       versions: ${{ steps.get-versions.outputs.versions }}
       latest_version: ${{ steps.get-versions.outputs.latest_version }}
     steps:
-      - name: Get latest major GitLab versions
+      - uses: actions/checkout@v3
+
+      # 版本来源见 .github/scripts/get_versions.py 顶部注释：
+      # atom feed 只有 ~14 个 tag（2~3 个 minor），漏掉过 18.8（升级路径必须停留的版本），
+      # 改用 tags API（一页 100 个 tag ≈ 12 个 minor ≈ 一年）。
+      - name: Resolve GitLab versions to build
         id: get-versions
-        run: |
-          VERSIONS=$(curl --silent "https://gitlab.com/gitlab-org/gitlab/-/tags?format=atom" | grep -oP '(?<=<summary>Version v)[v\.0-9\-]+(?=-ee)' | awk -F'.' '!seen[$1"."$2]++' | sort -Vr | head -n4)
-          VERSIONS_ARRAY=($VERSIONS)
-          LATEST_VERSION=${VERSIONS_ARRAY[0]}
-          VERSIONS_JSON=$(echo -n '['; for v in "${VERSIONS_ARRAY[@]}"; do echo -n "\"$v\","; done; echo -n ']')
-          VERSIONS_JSON="${VERSIONS_JSON%,}]" # Remove the trailing comma and close the JSON array
-          echo "VERSIONS=$VERSIONS_JSON" >> $GITHUB_ENV
-          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
-          echo "::set-output name=versions::$VERSIONS_JSON"
-          echo "::set-output name=latest_version::$LATEST_VERSION"
+        env:
+          INPUT_VERSIONS: ${{ github.event.inputs.versions }}
+        run: python3 .github/scripts/get_versions.py
 
   build:
     runs-on: ubuntu-latest
@@ -46,17 +49,23 @@ jobs:
           RELEASE_VERSION="$VERSION-$PACKAGE_CAT.0"
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
 
-          # Check if the tag exists in GHCR
-          GHCR_TOKEN=$(echo -n "${{ secrets.GITHUB_TOKEN }}" | base64 -w 0)
-          response=$(curl -s -H "Authorization: Bearer ${GHCR_TOKEN}" \
-            "https://ghcr.io/v2/${{ github.repository_owner }}/gitlab-arm64/manifests/$RELEASE_VERSION")
-            
-          if echo "$response" | grep -q "MANIFEST_UNKNOWN"; then
-            echo "Tag does not exist in GHCR. Continue the workflow."
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
-          else
-            echo "Tag exists in GHCR. Exit the workflow."
+          # Check if the tag exists in GHCR.
+          # 注意：这里必须用 GHCR 的匿名 pull token 查 manifest。原来那套
+          # `Authorization: Bearer $(base64 GITHUB_TOKEN)` 是无效凭据，实测无论 tag
+          # 存不存在都返回 MANIFEST_UNKNOWN，等于永远判定"不存在"、每次 run 全量重建。
+          TOKEN=$(curl -sS "https://ghcr.io/token?scope=repository:${{ github.repository_owner }}/gitlab-arm64:pull&service=ghcr.io" \
+            | python3 -c 'import sys, json; print(json.load(sys.stdin)["token"])')
+          CODE=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H 'Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.docker.distribution.manifest.v2+json' \
+            "https://ghcr.io/v2/${{ github.repository_owner }}/gitlab-arm64/manifests/${RELEASE_VERSION}")
+
+          if [ "$CODE" = "200" ]; then
+            echo "Tag $RELEASE_VERSION exists in GHCR. Skip the build."
             echo "TAG_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "Tag $RELEASE_VERSION does not exist in GHCR (HTTP $CODE). Continue the workflow."
+            echo "TAG_EXISTS=false" >> $GITHUB_ENV
           fi
 
 
