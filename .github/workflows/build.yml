@@ -8,6 +8,10 @@ on:
         description: '指定要构建的版本，逗号分隔。可写 X.Y（自动取该 minor 的最新 patch）或 X.Y.Z。留空 = 自动扫描各 minor 的最新 patch'
         required: false
         default: ''
+      force:
+        description: '忽略 GHCR 已有 tag，强制重建并重推标签（修复 latest / ee 等移动标签时用）'
+        type: boolean
+        default: false
 
 jobs:
   setup-versions:
@@ -48,6 +52,14 @@ jobs:
           VERSION=${{ matrix.PACKAGE_VERSIONS }}
           RELEASE_VERSION="$VERSION-$PACKAGE_CAT.0"
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_ENV
+
+          # force=true 时跳过存在性检查，强制重建并重推标签
+          # （用于把 latest / ee / <major>-ee 这类移动标签修复回正确的版本）
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            echo "force=true：跳过 GHCR 检查，强制重建并重推标签"
+            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+            exit 0
+          fi
 
           # Check if the tag exists in GHCR.
           # 注意：这里必须用 GHCR 的匿名 pull token 查 manifest。原来那套
